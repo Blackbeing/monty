@@ -1,9 +1,12 @@
 #ifndef MONTY_H
 #define MONTY_H
+#define _POSIX_C_SOURCE  200809L
+#define _GNU_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
@@ -40,5 +43,9 @@ typedef struct opt_arg
 	char *opt;
 	char *arg;
 } opt_arg_t;
+
+int stack_size(stack_t **stack);
+void stack_push(stack_t **stack, unsigned int i);
+void stack_pall(stack_t **stack, unsigned int i __attribute__((unused)));
 
 #endif /* MONTY_H */

@@ -1,34 +1,53 @@
 #include "monty.h"
 
 /**
- * tokenize -- Parse string to only two tokens (del leading, trailing spaces)
- * @str: pointer to string
- *
- * Return: opt_arg_t instance
+ * call_func -- Call function by optcode
+ * @stack: pointer to array of stack_t pointers
+ * @opt: string argument
+ * @arg: string argument
  */
-opt_arg_t tokenize(char *str)
+
+void call_func(stack_t **stack, char *opt, char *arg)
 {
-	char *s = str;
-	char *delim = " ";
-	char *opt, *arg;
-	opt_arg_t token;
+	int index;
 
-	opt = strtok(s, delim);
-	arg = strtok(NULL, delim);
+	instruction_t options[] = {
+	{"push", stack_push}, {"pall", stack_pall}, {NULL, NULL} };
 
-	token.opt = opt;
-	token.arg = arg;
-	return (token);
-
+	if (opt)
+	{
+		index = 0;
+		while (options[index].opcode)
+		{
+			if (strcmp(options[index].opcode, opt) == 0)
+			{
+				if (strcmp(opt, "pall") == 0)
+					options[index].f(stack, 0);
+				else
+					options[index].f(stack, atoi(arg));
+			}
+			index++;
+		}
+	}
 }
+
+/**
+ * main -- run main program
+ * @argc: int arg
+ * @argv: string arg
+ *
+ * Return: 0
+ */
 
 int main(int argc, char *argv[])
 {
 	FILE *stream;
 	char *line = NULL;
 	size_t len = 0;
-	ssize_t nread;
-	opt_arg_t token;
+	char *opt, *arg;
+	stack_t *p;
+
+	p = NULL;
 
 	if (argc != 2)
 	{
@@ -43,15 +62,13 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	nread = getline(&line, &len, stream);
-	while (nread != -1 )
+	while (getline(&line, &len, stream) != -1)
 	{
-		/* fwrite(line, nread, 1, stdout); */
-		/* TODO parse string */
-		token = tokenize(line);
-		printf("%s -> %s", token.opt, token.arg);
-		nread = getline(&line, &len, stream);
+		opt = strtok(line, " \n\t");
+		arg = strtok(NULL, " \n\t");
+		call_func(&p, opt, arg);
 	}
+
 	free(line);
 	fclose(stream);
 
